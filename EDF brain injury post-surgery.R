@@ -358,7 +358,7 @@ together <- ggarrange(plot_throm, plot_hemor, plot_wmi,plot_nobd,
 together
 #annotate figure
 annotate_figure(together,
-                 top = text_grob("End-diastolic flow results grouped by MRI results",
+                 top = text_grob("End-diastolic flow % by day after surgery for various cerebral MRI results",
                                  color = "black", face = "bold", size = 14),
                  left = textGrob("Percentage of Patients (%)", rot = 90, vjust = 1, gp = gpar(cex = 1.3, fontsize = 11)),
                  bottom = textGrob("Days post-surgery", gp = gpar(cex = 1.3, fontsize = 11)))

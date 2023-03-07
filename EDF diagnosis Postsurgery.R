@@ -251,10 +251,9 @@ together <- ggarrange(plot_TGA, plot_LVOTO, plot_SVP,plot_Overig,
 together
 #annotate figure
 annotate_figure(together,
-                top = text_grob("Enddiastolic flow in different CHD diagnosis groups post-surgery",
+                top = text_grob("End-diastolic flow % by day after surgery for various diagnostic groups",
                                 color = "black", face = "bold", size = 14),
                 left = textGrob("Percentage of Patients (%)", rot = 90, vjust = 1, gp = gpar(cex = 1.3, fontsize = 11)),
                 bottom = textGrob("Days post-surgery", gp = gpar(cex = 1.3, fontsize = 11)))
-
 
 
