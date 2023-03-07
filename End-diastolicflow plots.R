@@ -7,6 +7,7 @@ library(plyr)
 library(scales)
 library(RColorBrewer)
 library(ggsci)
+library(ggpubr)
 
 
 # Load data from Castor
@@ -88,7 +89,7 @@ total_data_LVOTO_perc$age_time_ultr <- as.numeric(total_data_LVOTO_perc$age_time
 plot_LVOTO <- ggplot() + geom_bar(aes(x = age_time_ultr,y = Percentage, fill = aca_flow), 
                           data = total_data_LVOTO_perc, stat="identity") + 
   scale_fill_discrete(labels = c("Absent flow", "Forward flow"), 
-  name="End-diastolic flow") + xlim(-1, 5) + labs(title = "End-diastolic flow in neonates diagnosed with LVOTO", x= "Age at time ultrasound (Days)", y= "Percentage of patiënts (%)")
+  name="End-diastolic flow") + xlim(-1, 5) + labs(title = "Diagnosed with LVOTO", x= "Age at time ultrasound (Days)", y= "Percentage of patiënts (%)")
 plot_LVOTO
 
 ##Plot TGA
@@ -109,7 +110,7 @@ total_data_TGA_perc$age_time_ultr <- as.numeric(total_data_TGA_perc$age_time_ult
 plot_TGA <- ggplot() + geom_bar(aes(x = age_time_ultr,y = Percentage, fill = aca_flow), 
                                   data = total_data_TGA_perc, stat="identity") + 
   scale_fill_discrete(labels = c("Absent flow", "Forward flow"), 
-                      name="End-diastolic flow") + xlim(-1, 5) + labs(title = "End-diastolic flow in neonates diagnosed with TGA", x= "Age at time ultrasound (Days)", y= "Percentage of patiënts (%)")
+                      name="End-diastolic flow") + xlim(-1, 5) + labs(title = "Diagnosed with TGA", x= "Age at time ultrasound (Days)", y= "Percentage of patiënts (%)")
 plot_TGA
 
 ##Plot SVP
@@ -130,7 +131,7 @@ total_data_SVP_perc$age_time_ultr <- as.numeric(total_data_SVP_perc$age_time_ult
 plot_SVP <- ggplot() + geom_bar(aes(x = age_time_ultr,y = Percentage, fill = aca_flow), 
                                    data = total_data_SVP_perc, stat="identity") + 
   scale_fill_discrete(labels = c("Absent flow", "Forward flow"), 
-                      name="End-diastolic flow") + xlim(-1, 5) + labs(title = "End-diastolic flow in neonates diagnosed with SVP", x= "Age at time ultrasound (Days)", y= "Percentage of patiënts (%)")
+                      name="End-diastolic flow") + xlim(-1, 5) + labs(title = "Diagnosed with SVP", x= "Age at time ultrasound (Days)", y= "Percentage of patiënts (%)")
 plot_SVP
 
 ##Plot Overig
@@ -151,13 +152,21 @@ total_data_Overig_perc$age_time_ultr <- as.numeric(total_data_Overig_perc$age_ti
 plot_Overig <- ggplot() + geom_bar(aes(x = age_time_ultr,y = Percentage, fill = aca_flow), 
                                 data = total_data_Overig_perc, stat="identity") + 
   scale_fill_discrete(labels = c("Absent flow", "Forward flow"), 
-                      name="End-diastolic flow") + xlim(-1, 5) + labs(title = "End-diastolic flow in neonates diagnosed with remaining diagnosis", x= "Age at time ultrasound (Days)", y= "Percentage of patiënts (%)")
+                      name="End-diastolic flow") + xlim(-1, 5) + labs(title = "Diagnosed with remaining diagnosis", x= "Age at time ultrasound (Days)", y= "Percentage of patiënts (%)")
 plot_Overig
 
 
 
-
-
+##Combine plots
+together <- ggarrange(plot_LVOTO, plot_TGA, plot_SVP,plot_Overig,
+                    labels = c("A", "B", "C"),
+                    common.legend = TRUE, legend = "bottom",
+                    ncol = 2, nrow = 2)
+together
+#annotate figure
+annotate_figure( together,
+  top = text_grob("Enddiastolic flow in different CHD diagnosis groups",
+                  color = "black", face = "bold", size = 14))
 
 
 
