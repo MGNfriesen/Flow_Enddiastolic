@@ -3,7 +3,6 @@ library(dplyr)
 library(ggplot2)
 library(ggthemes)
 library(extrafont)
-library(plyr)
 library(scales)
 library(RColorBrewer)
 library(ggsci)
@@ -70,11 +69,11 @@ total_data_Overig <- total_data %>% filter(Diagnosegroep %in% c("Overig"))
 
 
 ##Plot LVOTO
-total_data_LVOTO_perc<- total_data_LVOTO  %>%  group_by(age_time_ultr)%>% count()
+total_data_LVOTO_count <- total_data_LVOTO %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
-detach("package:plyr", unload = TRUE)
-
 total_data_LVOTO_perc<- total_data_LVOTO %>% 
   filter(!is.na(aca_flow)) %>% 
   group_by(age_time_ultr, aca_flow) %>% 
@@ -82,8 +81,10 @@ total_data_LVOTO_perc<- total_data_LVOTO %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
-#as numeric age_time_ultr
-total_data_LVOTO_perc$age_time_ultr <- as.numeric(total_data_LVOTO_perc$age_time_ultr)
+# add counts to total_data_Overig_perc
+total_data_LVOTO_perc <- total_data_LVOTO_perc %>% 
+  left_join(total_data_LVOTO_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
 
 #plot data
 plot_LVOTO <- ggplot(total_data_LVOTO_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -92,7 +93,7 @@ plot_LVOTO <- ggplot(total_data_LVOTO_perc, aes(x = age_time_ultr, y = Percentag
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
   labs(title = "Diagnosed with LVOTO", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -101,13 +102,19 @@ plot_LVOTO <- ggplot(total_data_LVOTO_perc, aes(x = age_time_ultr, y = Percentag
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0(   n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
+
 
 plot_LVOTO
 
 
 ##Plot TGA
-total_data_TGA_perc<- total_data_TGA  %>%  group_by(age_time_ultr)%>% count()
+total_data_TGA_count <- total_data_TGA %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
 total_data_TGA_perc<- total_data_TGA %>% 
@@ -117,8 +124,12 @@ total_data_TGA_perc<- total_data_TGA %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
-#as numeric age_time_ultr
-total_data_TGA_perc$age_time_ultr <- as.numeric(total_data_TGA_perc$age_time_ultr)
+# add counts to TGA
+total_data_TGA_perc <- total_data_TGA_perc %>% 
+  left_join(total_data_TGA_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
+
+
 
 #plot data
 plot_TGA <- ggplot(total_data_TGA_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -127,7 +138,7 @@ plot_TGA <- ggplot(total_data_TGA_perc, aes(x = age_time_ultr, y = Percentage, f
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
   labs(title = "Diagnosed with TGA", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -136,12 +147,17 @@ plot_TGA <- ggplot(total_data_TGA_perc, aes(x = age_time_ultr, y = Percentage, f
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0(   n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
 
 plot_TGA
 
 ##Plot SVP
-total_data_SVP_perc<- total_data_SVP  %>%  group_by(age_time_ultr)%>% count()
+total_data_SVP_count <- total_data_SVP %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
 total_data_SVP_perc<- total_data_SVP %>% 
@@ -151,8 +167,12 @@ total_data_SVP_perc<- total_data_SVP %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
-#as numeric age_time_ultr
-total_data_SVP_perc$age_time_ultr <- as.numeric(total_data_SVP_perc$age_time_ultr)
+# add counts to SVP
+total_data_SVP_perc <- total_data_SVP_perc %>% 
+  left_join(total_data_SVP_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
+
+
 
 #plot data
 plot_SVP <- ggplot(total_data_SVP_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -161,7 +181,7 @@ plot_SVP <- ggplot(total_data_SVP_perc, aes(x = age_time_ultr, y = Percentage, f
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
   labs(title = "Diagnosed with SVP", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -170,13 +190,19 @@ plot_SVP <- ggplot(total_data_SVP_perc, aes(x = age_time_ultr, y = Percentage, f
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0(   n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
 
 plot_SVP
 
 
-##Plot Overig
-total_data_Overig_perc<- total_data_Overig  %>%  group_by(age_time_ultr)%>% count()
+##plot Overig
+
+total_data_Overig_count <- total_data_Overig %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
 total_data_Overig_perc<- total_data_Overig %>% 
@@ -186,8 +212,15 @@ total_data_Overig_perc<- total_data_Overig %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
+# add counts to total_data_Overig_perc
+total_data_Overig_perc <- total_data_Overig_perc %>% 
+  left_join(total_data_Overig_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
+
+
 #as numeric age_time_ultr
 total_data_Overig_perc$age_time_ultr <- as.numeric(total_data_Overig_perc$age_time_ultr)
+
 
 #plot data
 plot_Overig <- ggplot(total_data_Overig_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -195,8 +228,8 @@ plot_Overig <- ggplot(total_data_Overig_perc, aes(x = age_time_ultr, y = Percent
   scale_fill_manual(values = c("#f28e2c","#4e79a7"), 
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
-  labs(title = "Diagnosed with remaining diagnosis", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+  labs(title = "Diagnosed with other CHD diagnosis", 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -205,25 +238,28 @@ plot_Overig <- ggplot(total_data_Overig_perc, aes(x = age_time_ultr, y = Percent
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0( n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
+
+
 
 plot_Overig
 
 
-
-
-
-
 ##Combine plots
-together <- ggarrange(plot_LVOTO, plot_TGA, plot_SVP,plot_Overig,
+together <- ggarrange(plot_TGA, plot_LVOTO, plot_SVP,plot_Overig, 
                       labels = c("A", "B", "C","D"),
-                      common.legend = TRUE, legend = "bottom",
+                      
+                      common.legend = TRUE, legend = "right",
                       ncol = 2, nrow = 2)
 together
 #annotate figure
-annotate_figure( together,
-                 top = text_grob("End-diastolic flow in different CHD diagnosis groups post-birth",
-                                 color = "black", face = "bold", size = 14))
-
+annotate_figure(together,
+                top = text_grob("Enddiastolic flow in different CHD diagnosis groups post-surgery",
+                                color = "black", face = "bold", size = 14),
+                left = textGrob("Percentage of Patients (%)", rot = 90, vjust = 1, gp = gpar(cex = 1.3, fontsize = 11)),
+                bottom = textGrob("Days post-birth", gp = gpar(cex = 1.3, fontsize = 11)))
 
 

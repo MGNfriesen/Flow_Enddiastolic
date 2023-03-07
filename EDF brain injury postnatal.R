@@ -3,7 +3,6 @@ library(dplyr)
 library(ggplot2)
 library(ggthemes)
 library(extrafont)
-library(plyr)
 library(scales)
 library(RColorBrewer)
 library(ggsci)
@@ -128,11 +127,11 @@ total_data_nobd<-filter(total_data_birth, total_data_birth$bd_total == "0")
 
 
 ##Plot hemorrhage
-total_data_hemor_perc<- total_data_hemor %>%  group_by(age_time_ultr)%>% count()
+total_data_hemor_count <- total_data_hemor %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
-detach("package:plyr", unload = TRUE)
-
 total_data_hemor_perc<- total_data_hemor %>% 
   filter(!is.na(aca_flow)) %>% 
   group_by(age_time_ultr, aca_flow) %>% 
@@ -140,8 +139,10 @@ total_data_hemor_perc<- total_data_hemor %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
-#as numeric age_time_ultr
-total_data_hemor_perc$age_time_ultr <- as.numeric(total_data_hemor_perc$age_time_ultr)
+# add counts to total_data_nobd_perc
+total_data_hemor_perc <- total_data_hemor_perc %>% 
+  left_join(total_data_hemor_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
 
 #plot data
 plot_hemor <- ggplot(total_data_hemor_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -150,7 +151,7 @@ plot_hemor <- ggplot(total_data_hemor_perc, aes(x = age_time_ultr, y = Percentag
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
   labs(title = "Hemorrhage", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -159,13 +160,19 @@ plot_hemor <- ggplot(total_data_hemor_perc, aes(x = age_time_ultr, y = Percentag
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0(   n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
+
 
 plot_hemor
 
 
 ##Plot thrombosis
-total_data_thromb_perc<- total_data_thromb  %>%  group_by(age_time_ultr)%>% count()
+total_data_thromb_count <- total_data_thromb %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
 total_data_thromb_perc<- total_data_thromb %>% 
@@ -175,8 +182,12 @@ total_data_thromb_perc<- total_data_thromb %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
-#as numeric age_time_ultr
-total_data_thromb_perc$age_time_ultr <- as.numeric(total_data_thromb_perc$age_time_ultr)
+# add counts to total_data_nobd_perc
+total_data_thromb_perc <- total_data_thromb_perc %>% 
+  left_join(total_data_thromb_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
+
+
 
 #plot data
 plot_throm <- ggplot(total_data_thromb_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -185,7 +196,7 @@ plot_throm <- ggplot(total_data_thromb_perc, aes(x = age_time_ultr, y = Percenta
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
   labs(title = "Thrombosis", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -194,12 +205,17 @@ plot_throm <- ggplot(total_data_thromb_perc, aes(x = age_time_ultr, y = Percenta
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0(   n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
 
 plot_throm
 
 ##Plot WMI
-total_data_wmi_perc<- total_data_wmi  %>%  group_by(age_time_ultr)%>% count()
+total_data_wmi_count <- total_data_wmi %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
 total_data_wmi_perc<- total_data_wmi %>% 
@@ -209,8 +225,12 @@ total_data_wmi_perc<- total_data_wmi %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
-#as numeric age_time_ultr
-total_data_wmi_perc$age_time_ultr <- as.numeric(total_data_wmi_perc$age_time_ultr)
+# add counts to total_data_nobd_perc
+total_data_wmi_perc <- total_data_wmi_perc %>% 
+  left_join(total_data_wmi_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
+
+
 
 #plot data
 plot_wmi <- ggplot(total_data_wmi_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -219,7 +239,7 @@ plot_wmi <- ggplot(total_data_wmi_perc, aes(x = age_time_ultr, y = Percentage, f
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
   labs(title = "White matter injury", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -228,13 +248,18 @@ plot_wmi <- ggplot(total_data_wmi_perc, aes(x = age_time_ultr, y = Percentage, f
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0(   n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
 
 plot_wmi
 
 
 ##Plot wsi
-total_data_wsi_perc<- total_data_wsi  %>%  group_by(age_time_ultr)%>% count()
+total_data_wsi_count <- total_data_wsi %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
 total_data_wsi_perc<- total_data_wsi %>% 
@@ -244,8 +269,11 @@ total_data_wsi_perc<- total_data_wsi %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
-#as numeric age_time_ultr
-total_data_wsi_perc$age_time_ultr <- as.numeric(total_data_wsi_perc$age_time_ultr)
+# add counts to total_data_nobd_perc
+total_data_wsi_perc <- total_data_wsi_perc %>% 
+  left_join(total_data_wsi_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
+
 
 #plot data
 plot_wsi <- ggplot(total_data_wsi_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -254,7 +282,7 @@ plot_wsi <- ggplot(total_data_wsi_perc, aes(x = age_time_ultr, y = Percentage, f
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
   labs(title = "Watershed injury", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -263,13 +291,18 @@ plot_wsi <- ggplot(total_data_wsi_perc, aes(x = age_time_ultr, y = Percentage, f
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0(   n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
 
 plot_wsi
 
 ##plot no brain damage
 
-total_data_nobd_perc<- total_data_nobd  %>%  group_by(age_time_ultr)%>% count()
+total_data_nobd_count <- total_data_nobd %>% 
+  group_by(age_time_ultr, aca_flow) %>% 
+  summarise(n = n())
 
 #calculate percentage normal and absent flow per day
 total_data_nobd_perc<- total_data_nobd %>% 
@@ -279,8 +312,15 @@ total_data_nobd_perc<- total_data_nobd %>%
   group_by(age_time_ultr) %>% 
   mutate(Percentage=Percentage/sum(Percentage)*100)
 
+# add counts to total_data_nobd_perc
+total_data_nobd_perc <- total_data_nobd_perc %>% 
+  left_join(total_data_nobd_count, by = c("age_time_ultr", "aca_flow")) %>% 
+  mutate(n = ifelse(is.na(n), 0, n))  # add closing parenthesis here
+
+
 #as numeric age_time_ultr
 total_data_nobd_perc$age_time_ultr <- as.numeric(total_data_nobd_perc$age_time_ultr)
+
 
 #plot data
 plot_nobd <- ggplot(total_data_nobd_perc, aes(x = age_time_ultr, y = Percentage, fill = aca_flow)) + 
@@ -289,7 +329,7 @@ plot_nobd <- ggplot(total_data_nobd_perc, aes(x = age_time_ultr, y = Percentage,
                     labels = c("Absent flow", "Forward flow"), 
                     name = "End-diastolic flow") +
   labs(title = "No brain injury", 
-       x = "Days post-birth", y = "Percentage of Patients (%)") + 
+       x = ""  , y = ""  ) + 
   theme_classic() +
   theme(axis.text = element_text(size = 12), 
         axis.title = element_text(size = 12), 
@@ -298,21 +338,29 @@ plot_nobd <- ggplot(total_data_nobd_perc, aes(x = age_time_ultr, y = Percentage,
         panel.grid.major.y = element_line(color = "gray80"), 
         panel.grid.minor.y = element_blank(),
         panel.border = element_blank(), 
-        panel.background = element_blank())
+        panel.background = element_blank())+
+  geom_text(aes(label = paste0( n)), 
+            position = position_stack(vjust = 0.5), 
+            size = 4, color="white")
+
+
 
 plot_nobd
 
 
 ##Combine plots
-together <- ggarrange(plot_throm, plot_hemor, plot_wmi,plot_nobd,
+together <- ggarrange(plot_throm, plot_hemor, plot_wmi,plot_nobd, 
                       labels = c("A", "B", "C","D"),
-                      common.legend = TRUE, legend = "bottom",
+                      
+                      common.legend = TRUE, legend = "right",
                       ncol = 2, nrow = 2)
 together
 #annotate figure
-annotate_figure( together,
-                 top = text_grob("End-diastolic flow results grouped by MRI results",
-                                 color = "black", face = "bold", size = 14))
+annotate_figure(together,
+                top = text_grob("End-diastolic flow results grouped by MRI results",
+                                color = "black", face = "bold", size = 14),
+                left = textGrob("Percentage of Patients (%)", rot = 90, vjust = 1, gp = gpar(cex = 1.3, fontsize = 11)),
+                bottom = textGrob("Days post-birth", gp = gpar(cex = 1.3, fontsize = 11)))
 
 
 
